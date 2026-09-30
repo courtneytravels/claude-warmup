@@ -1,0 +1,33 @@
+name: Claude 2am Note
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 2 * * *'
+      timezone: 'Australia/Sydney'
+
+jobs:
+  send-note:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send note to Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            https://api.anthropic.com/v1/messages \
+            -H "content-type: application/json" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -d '{
+              "model": "claude-sonnet-4-6",
+              "max_tokens": 20,
+              "messages": [
+                {
+                  "role": "user",
+                  "content": "Good morning. Please reply with: Morning note received."
+                }
+              ]
+            }'
